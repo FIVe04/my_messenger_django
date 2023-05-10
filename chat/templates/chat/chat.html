@@ -1,0 +1,47 @@
+{% extends 'core/base.html' %}
+
+{% block title %} {{ chat.name}} {% endblock %}
+
+{% block content %}
+<h1>{{ chat.name }}</h1>
+
+<div>
+    <div style="background-color: aquamarine">
+        <h3>Username</h3>
+        <h2>Hello, my firend! How r u doing?</h2>
+    </div>
+</div>
+
+<div>
+    <form method="post" action=".">
+        {% csrf_token %}
+        <input type="text" name="content" placeholder="Ur message">
+
+        <button id="chat-message-submit">Send</button>
+    </form>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+{{ chat.slug|json_script:"json-chatname" }}
+
+<script>
+    const chatName = JSON.parse(document.getElementById('json-chatname').textContent)
+    const chatSocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/'
+        + chatName
+        + '/'
+    );
+    chatSocket.onmessage = function(e) {
+        console.log('onmessage');
+        console.log(e);
+    }
+    chatSocket.onclose = function(e) {
+        console.log('onclose');
+        console.log(e);
+    }
+</script>
+{% endblock %}
